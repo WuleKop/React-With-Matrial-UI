@@ -6,21 +6,38 @@ import {muscles, exercises } from './store.js'
 //Can be export default class extends Component and ignore the final export statement
 export class App extends Component {
   state = {
-    exercises
+    exercises,
+    exercise: {}
   }
 
   gtExerciseByMuscle(){
-    return this.state.exercises
-
+    return Object.entries (this.state.exercises.reduce((execr, exec)=> {
+      const {muscles} = exec;
+      execr[muscles] = execr[muscles] ? [...execr[muscles], exec] : [exec];
+      return execr }, {}))
+  }
+  handleCategorySelected = category => {
+    this.setState ({
+      category
+    })
+  }
+  handleExerciseSelected = id => {
+    this.setState(({exercises}) => ({
+      exercise: exercises.find(ex => ex.id === id)
+    }))
   }
 
   render() {
-    console.log(this.gtExerciseByMuscle())
+    const exercises = this.gtExerciseByMuscle(),
+    {category, exercise} = this.state
     return (
       <Fragment>
         <Header/>
-        <Exercises exercises={exercises}/>
-        <Footer muscles ={muscles}/>        
+        <Exercises exercise={exercise} category = {category} exercises={exercises} onSelect = {this.handleExerciseSelected}/>
+        <Footer 
+        category={category}
+        muscles ={muscles}
+        onSelect = {this.handleCategorySelected}/>        
       </Fragment>
     )
   }
